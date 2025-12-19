@@ -9,83 +9,190 @@
   <body>
     <div class="app-container">
       <!-- 侧边栏 -->
-      <div class="sidebar">
-        <div class="sidebar-header">
-          <h2>📚 ReadHelper</h2>
-        </div>
-
-        <div class="sidebar-section">
-          <button class="btn btn-primary" id="openFileBtn">📂 打开文档</button>
-        </div>
-
-        <!-- 笔记列表 -->
-        <div class="sidebar-section">
-          <h3>📝 笔记</h3>
-          <div id="notesList" class="notes-list">
-            <p class="empty-state">暂无笔记</p>
+      <div class="sidebar" id="sidebar">
+        <!-- 图标栏（收起时显示） -->
+        <div class="sidebar-icons">
+          <div class="sidebar-icon-header">
+            <span class="icon-logo">📚</span>
           </div>
+          <button class="sidebar-icon-btn" id="iconOpenFile" title="打开文档">
+            📂
+          </button>
+          <button class="sidebar-icon-btn" id="iconHistory" title="最近打开">
+            🕐
+          </button>
+          <button class="sidebar-icon-btn" id="iconNotes" title="笔记">
+            📝
+          </button>
+          <button class="sidebar-icon-btn" id="iconBookmarks" title="书签">
+            🔖
+          </button>
+          <div class="sidebar-icon-spacer"></div>
+          <button
+            class="sidebar-icon-btn sidebar-toggle-btn"
+            id="sidebarToggle"
+            title="展开/收起侧边栏"
+          >
+            »
+          </button>
         </div>
 
-        <!-- 书签列表 -->
-        <div class="sidebar-section">
-          <h3>🔖 书签</h3>
-          <div id="bookmarksList" class="bookmarks-list">
-            <p class="empty-state">暂无书签</p>
+        <!-- 完整内容（展开时显示） -->
+        <div class="sidebar-content">
+          <div class="sidebar-header">
+            <h2>📚 ReadHelper</h2>
+          </div>
+
+          <div class="sidebar-section">
+            <button class="btn btn-primary" id="openFileBtn">
+              📂 打开文档
+            </button>
+          </div>
+
+          <!-- 最近打开的文档 -->
+          <div class="sidebar-section history-section">
+            <div class="section-header">
+              <h3>🕐 最近打开</h3>
+              <button
+                class="btn-text"
+                id="clearHistoryBtn"
+                title="清除所有历史"
+              >
+                清除
+              </button>
+            </div>
+            <div id="historyList" class="history-list">
+              <p class="empty-state">暂无历史记录</p>
+            </div>
+          </div>
+
+          <!-- 笔记列表 -->
+          <div class="sidebar-section collapsible-section">
+            <div class="section-header collapsible-header" id="notesHeader">
+              <h3>📝 笔记</h3>
+              <span class="collapse-icon">▼</span>
+            </div>
+            <div id="notesList" class="notes-list collapsible-content">
+              <p class="empty-state">暂无笔记</p>
+            </div>
+          </div>
+
+          <!-- 书签列表 -->
+          <div class="sidebar-section collapsible-section">
+            <div class="section-header collapsible-header" id="bookmarksHeader">
+              <h3>🔖 书签</h3>
+              <span class="collapse-icon">▼</span>
+            </div>
+            <div id="bookmarksList" class="bookmarks-list collapsible-content">
+              <p class="empty-state">暂无书签</p>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- 主内容区 -->
       <div class="main-content">
-        <div class="toolbar">
-          <div class="file-info">
-            <span id="fileName">未打开文档</span>
+        <!-- 固定头部区域 -->
+        <div class="fixed-header">
+          <div class="toolbar">
+            <div class="file-info">
+              <span id="fileName">未打开文档</span>
+            </div>
           </div>
-          <div class="toolbar-actions">
-            <button
-              class="btn btn-icon"
-              id="addNoteBtn"
-              title="添加笔记"
-              disabled
-            >
-              ✏️ 添加笔记
-            </button>
-            <button
-              class="btn btn-icon"
-              id="addBookmarkBtn"
-              title="添加书签"
-              disabled
-            >
-              🔖 添加书签
-            </button>
-            <button
-              class="btn btn-icon"
-              id="translateBtn"
-              title="翻译选中文本"
-              disabled
-            >
-              🌐 翻译
-            </button>
+          <!-- 功能工具栏 -->
+          <div class="action-toolbar" id="actionToolbar">
+            <div class="zoom-controls" id="zoomControls">
+              <button class="btn btn-sm" id="mainZoomOut" title="缩小">
+                −
+              </button>
+              <span class="zoom-level" id="mainZoomLevel">150%</span>
+              <button class="btn btn-sm" id="mainZoomIn" title="放大">+</button>
+              <span class="page-info" id="mainPageInfo"></span>
+            </div>
+            <div class="toolbar-actions">
+              <button
+                class="btn btn-icon"
+                id="addNoteBtn"
+                title="添加笔记"
+                disabled
+              >
+                ✏️ 笔记
+              </button>
+              <button
+                class="btn btn-icon"
+                id="addBookmarkBtn"
+                title="添加书签"
+                disabled
+              >
+                🔖 书签
+              </button>
+              <button
+                class="btn btn-icon"
+                id="translateBtn"
+                title="翻译选中文本"
+                disabled
+              >
+                🌐 翻译
+              </button>
+              <button
+                class="btn btn-icon"
+                id="readBtn"
+                title="朗读选中文本"
+                disabled
+              >
+                🔊 朗读
+              </button>
+              <button
+                class="btn btn-icon btn-extract"
+                id="extractBtn"
+                title="框选提取文本"
+                disabled
+              >
+                ✂️ 框选
+              </button>
+            </div>
           </div>
         </div>
 
-        <div class="content-area">
-          <div id="documentViewer" class="document-viewer">
-            <div class="welcome-screen">
-              <div class="welcome-content">
-                <h1>欢迎使用 ReadHelper</h1>
-                <p>一个功能强大的文档阅读助手</p>
-                <ul class="feature-list">
-                  <li>📄 支持多种文档格式 (PDF, TXT, Markdown, HTML)</li>
-                  <li>🌐 智能翻译功能</li>
-                  <li>📝 便捷的笔记记录</li>
-                  <li>🎨 文本高亮标记</li>
-                  <li>🔖 书签管理</li>
-                </ul>
-                <button class="btn btn-large btn-primary" id="openFileBtn2">
-                  开始使用 - 打开文档
-                </button>
+        <div class="content-wrapper">
+          <div class="content-area">
+            <div id="documentViewer" class="document-viewer">
+              <div class="welcome-screen">
+                <div class="welcome-content">
+                  <h1>欢迎使用 ReadHelper</h1>
+                  <p>一个功能强大的文档阅读助手</p>
+                  <ul class="feature-list">
+                    <li>📄 支持多种文档格式 (PDF, TXT, Markdown, HTML)</li>
+                    <li>🌐 智能翻译功能</li>
+                    <li>📝 便捷的笔记记录</li>
+                    <li>🎨 文本高亮标记</li>
+                    <li>🔖 书签管理</li>
+                  </ul>
+                  <button class="btn btn-large btn-primary" id="openFileBtn2">
+                    开始使用 - 打开文档
+                  </button>
+                </div>
               </div>
+            </div>
+          </div>
+
+          <!-- 右侧提取文本面板 -->
+          <div class="extraction-panel hidden" id="extractionPanel">
+            <div class="extraction-panel-header">
+              <h3>📋 提取记录</h3>
+              <div class="extraction-panel-actions">
+                <button
+                  class="btn btn-sm"
+                  id="clearExtractions"
+                  title="清空所有"
+                >
+                  清空
+                </button>
+                <button class="btn-close" id="closeExtractionPanel">×</button>
+              </div>
+            </div>
+            <div class="extraction-list" id="extractionList">
+              <p class="empty-state">点击「框选」按钮后在PDF上画框选择区域</p>
             </div>
           </div>
         </div>
@@ -130,6 +237,51 @@
             <div class="panel-actions">
               <button class="btn btn-secondary" id="cancelNote">取消</button>
               <button class="btn btn-primary" id="saveNote">保存</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TTS 朗读控制面板 -->
+        <div id="ttsPanel" class="tts-panel hidden">
+          <div class="panel-header">
+            <h3>🔊 文本朗读</h3>
+            <button class="btn-close" id="closeTTS">×</button>
+          </div>
+          <div class="panel-content">
+            <div class="tts-text-preview">
+              <h4>朗读内容：</h4>
+              <p id="ttsText"></p>
+            </div>
+            <div class="tts-info">
+              <span>语言：<strong id="ttsLanguage">自动检测</strong></span>
+              <span id="ttsStatus">准备就绪</span>
+            </div>
+            <div class="tts-controls">
+              <button class="btn btn-primary" id="ttsPlayBtn" title="播放">
+                ▶️ 播放
+              </button>
+              <button
+                class="btn btn-primary hidden"
+                id="ttsPauseBtn"
+                title="暂停"
+              >
+                ⏸️ 暂停
+              </button>
+              <button class="btn btn-secondary" id="ttsStopBtn" title="停止">
+                ⏹️ 停止
+              </button>
+            </div>
+            <div class="tts-settings">
+              <label>语速：</label>
+              <input
+                type="range"
+                id="ttsRate"
+                min="0.5"
+                max="2"
+                step="0.1"
+                value="1"
+              />
+              <span id="ttsRateValue">1.0x</span>
             </div>
           </div>
         </div>

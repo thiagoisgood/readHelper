@@ -1,0 +1,17 @@
+{
+  "googleCloud": {
+    "apiKey": "YOUR_GOOGLE_CLOUD_API_KEY",
+    "projectId": "YOUR_PROJECT_ID"
+  },
+  "translation": {
+    "defaultSourceLanguage": "auto",
+    "defaultTargetLanguage": "zh-CN",
+    "alternativeTargetLanguage": "en"
+  },
+  "_comment": {
+    "说明": "请将此文件复制为 config.json 并填写正确的 API 凭证",
+    "apiKey": "从 Google Cloud Console 获取的 API 密钥",
+    "projectId": "您的 Google Cloud 项目 ID",
+    "获取方式": "https://console.cloud.google.com/apis/credentials"
+  }
+}
