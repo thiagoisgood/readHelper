@@ -43,7 +43,7 @@ let currentUtterance = null;
 let isSpeaking = false;
 let isPaused = false;
 let availableVoices = [];
-let currentTTSRate = 1.0;
+let currentTTSRate = 0.8; // 默认0.8，对中文更友好
 
 // 历史记录
 let documentHistory = [];
@@ -1310,6 +1310,11 @@ function loadVoices() {
       `${i}: ${v.name} (${v.lang}) ${v.localService ? "[local]" : "[remote]"}`
     );
   });
+  
+  // 如果语音列表为空，稍后重试
+  if (availableVoices.length === 0) {
+    setTimeout(loadVoices, 100);
+  }
 }
 
 // 检测文本语言（中文/英文）
@@ -1322,25 +1327,40 @@ function detectLanguage(text) {
 
 // 根据语言选择最佳语音
 function selectVoiceForLanguage(lang) {
+  // 确保语音已加载
   if (availableVoices.length === 0) {
-    loadVoices();
+    availableVoices = speechSynthesis.getVoices();
+    console.log("Re-loaded voices:", availableVoices.length);
   }
 
   let preferredVoice = null;
 
   if (lang === "zh") {
-    // macOS 高质量中文语音优先
+    // macOS 高质量中文语音优先 - 扩展候选列表
     preferredVoice =
+      // 婷婷 - macOS 高质量中文语音
       availableVoices.find(
         (v) => v.name.includes("Tingting") || v.name.includes("婷婷")
       ) ||
+      // 其他 macOS 中文语音
       availableVoices.find(
         (v) => v.name.includes("Sinji") || v.name.includes("Meijia")
       ) ||
+      // 李连杰、玉林等语音
+      availableVoices.find(
+        (v) => v.name.includes("Lilian") || v.name.includes("Yu-shu")
+      ) ||
+      // 简体中文本地语音
       availableVoices.find((v) => v.lang === "zh-CN" && v.localService) ||
+      // 繁体中文
+      availableVoices.find((v) => v.lang === "zh-TW" && v.localService) ||
+      availableVoices.find((v) => v.lang === "zh-HK" && v.localService) ||
+      // 任何中文语音
       availableVoices.find((v) => v.lang === "zh-CN") ||
+      availableVoices.find((v) => v.lang === "zh-TW") ||
+      availableVoices.find((v) => v.lang === "zh-HK") ||
       availableVoices.find((v) => v.lang.startsWith("zh")) ||
-      availableVoices.find((v) => v.lang.includes("CN"));
+      availableVoices.find((v) => v.lang.includes("CN") || v.lang.includes("Chinese"));
   } else {
     // macOS 高质量英文语音优先
     preferredVoice =
@@ -1353,8 +1373,15 @@ function selectVoiceForLanguage(lang) {
       availableVoices.find((v) => v.lang.startsWith("en"));
   }
 
-  console.log("Selected voice:", preferredVoice?.name, preferredVoice?.lang);
-  return preferredVoice || availableVoices[0];
+  console.log("Selected voice for lang", lang, ":", preferredVoice?.name, preferredVoice?.lang);
+  
+  // 如果没找到匹配语音，使用默认语音但设置正确的语言
+  if (!preferredVoice && availableVoices.length > 0) {
+    console.warn("No matching voice found for language:", lang);
+    preferredVoice = availableVoices[0];
+  }
+  
+  return preferredVoice;
 }
 
 // 朗读选中文本
@@ -1384,10 +1411,17 @@ function speakText(text) {
   if (voice) {
     currentUtterance.voice = voice;
     currentUtterance.lang = voice.lang;
+  } else {
+    // 如果没有找到语音，设置默认语言
+    currentUtterance.lang = lang === "zh" ? "zh-CN" : "en-US";
+    console.warn("No voice available, using default lang:", currentUtterance.lang);
   }
+  
   currentUtterance.rate = currentTTSRate;
   currentUtterance.pitch = 1.0;
   currentUtterance.volume = 1.0;
+  
+  console.log("TTS config - Voice:", voice?.name, "Lang:", currentUtterance.lang, "Rate:", currentTTSRate);
 
   // 事件监听
   currentUtterance.onstart = () => {
