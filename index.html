@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReadHelper - 文档阅读助手</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- 侧边栏 -->
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h2>📚 ReadHelper</h2>
+        </div>
+
+        <div class="sidebar-section">
+          <button class="btn btn-primary" id="openFileBtn">📂 打开文档</button>
+        </div>
+
+        <!-- 笔记列表 -->
+        <div class="sidebar-section">
+          <h3>📝 笔记</h3>
+          <div id="notesList" class="notes-list">
+            <p class="empty-state">暂无笔记</p>
+          </div>
+        </div>
+
+        <!-- 书签列表 -->
+        <div class="sidebar-section">
+          <h3>🔖 书签</h3>
+          <div id="bookmarksList" class="bookmarks-list">
+            <p class="empty-state">暂无书签</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 主内容区 -->
+      <div class="main-content">
+        <div class="toolbar">
+          <div class="file-info">
+            <span id="fileName">未打开文档</span>
+          </div>
+          <div class="toolbar-actions">
+            <button
+              class="btn btn-icon"
+              id="addNoteBtn"
+              title="添加笔记"
+              disabled
+            >
+              ✏️ 添加笔记
+            </button>
+            <button
+              class="btn btn-icon"
+              id="addBookmarkBtn"
+              title="添加书签"
+              disabled
+            >
+              🔖 添加书签
+            </button>
+            <button
+              class="btn btn-icon"
+              id="translateBtn"
+              title="翻译选中文本"
+              disabled
+            >
+              🌐 翻译
+            </button>
+          </div>
+        </div>
+
+        <div class="content-area">
+          <div id="documentViewer" class="document-viewer">
+            <div class="welcome-screen">
+              <div class="welcome-content">
+                <h1>欢迎使用 ReadHelper</h1>
+                <p>一个功能强大的文档阅读助手</p>
+                <ul class="feature-list">
+                  <li>📄 支持多种文档格式 (PDF, TXT, Markdown, HTML)</li>
+                  <li>🌐 智能翻译功能</li>
+                  <li>📝 便捷的笔记记录</li>
+                  <li>🎨 文本高亮标记</li>
+                  <li>🔖 书签管理</li>
+                </ul>
+                <button class="btn btn-large btn-primary" id="openFileBtn2">
+                  开始使用 - 打开文档
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 翻译面板 -->
+        <div id="translationPanel" class="translation-panel hidden">
+          <div class="panel-header">
+            <h3>翻译结果</h3>
+            <button class="btn-close" id="closeTranslation">×</button>
+          </div>
+          <div class="panel-content">
+            <div class="original-text">
+              <h4>原文：</h4>
+              <p id="originalText"></p>
+            </div>
+            <div class="translated-text">
+              <h4>译文：</h4>
+              <p id="translatedText">翻译中...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 笔记编辑面板 -->
+        <div id="notePanel" class="note-panel hidden">
+          <div class="panel-header">
+            <h3>添加笔记</h3>
+            <button class="btn-close" id="closeNote">×</button>
+          </div>
+          <div class="panel-content">
+            <div class="note-context">
+              <h4>选中文本：</h4>
+              <p id="noteContext"></p>
+            </div>
+            <div class="note-input">
+              <h4>笔记内容：</h4>
+              <textarea
+                id="noteContent"
+                rows="5"
+                placeholder="输入您的笔记..."
+              ></textarea>
+            </div>
+            <div class="panel-actions">
+              <button class="btn btn-secondary" id="cancelNote">取消</button>
+              <button class="btn btn-primary" id="saveNote">保存</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="renderer.js"></script>
+  </body>
+</html>

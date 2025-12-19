@@ -1,0 +1,615 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Helvetica", "Arial", sans-serif;
+  background-color: #f5f5f7;
+  color: #1d1d1f;
+  overflow: hidden;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+/* 侧边栏样式 */
+.sidebar {
+  width: 280px;
+  background-color: #fff;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.sidebar-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.sidebar-section {
+  padding: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.sidebar-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #666;
+}
+
+/* 按钮样式 */
+.btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  width: 100%;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background-color: #d0d0d0;
+}
+
+.btn-icon {
+  padding: 8px 12px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  margin-left: 8px;
+}
+
+.btn-icon:hover:not(:disabled) {
+  background-color: #f5f5f7;
+  border-color: #667eea;
+}
+
+.btn-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-large {
+  padding: 14px 28px;
+  font-size: 16px;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.btn-close:hover {
+  background-color: #f0f0f0;
+}
+
+/* 主内容区 */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.toolbar {
+  padding: 15px 20px;
+  background-color: white;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.file-info {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background-color: #f5f5f7;
+}
+
+.document-viewer {
+  background-color: white;
+  border-radius: 12px;
+  padding: 40px;
+  min-height: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  line-height: 1.8;
+  font-size: 16px;
+}
+
+.document-viewer h1,
+.document-viewer h2,
+.document-viewer h3,
+.document-viewer h4,
+.document-viewer h5,
+.document-viewer h6 {
+  margin-top: 24px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.document-viewer p {
+  margin-bottom: 16px;
+}
+
+.document-viewer code {
+  background-color: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: "Monaco", "Menlo", monospace;
+  font-size: 14px;
+}
+
+.document-viewer pre {
+  background-color: #f5f5f7;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.document-viewer pre code {
+  background: none;
+  padding: 0;
+}
+
+/* 文本内容保持原格式 */
+.document-viewer .text-content,
+.document-viewer .pdf-content {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Helvetica", "Arial", sans-serif;
+  line-height: 1.8;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+/* PDF 渲染样式 */
+.pdf-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.pdf-info {
+  background-color: #667eea;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.pdf-page-wrapper {
+  position: relative;
+  background-color: white;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.page-header {
+  background-color: #f5f5f7;
+  padding: 8px 16px;
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.pdf-page {
+  display: block;
+  margin: 0 auto;
+}
+
+.text-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  opacity: 0.2;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.text-layer span {
+  position: absolute;
+  white-space: pre;
+  color: transparent;
+  pointer-events: auto;
+}
+
+.text-layer span::selection {
+  background: #b3d4fc;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: #666;
+  font-size: 16px;
+}
+
+/* 欢迎屏幕 */
+.welcome-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+}
+
+.welcome-content {
+  text-align: center;
+  max-width: 600px;
+}
+
+.welcome-content h1 {
+  font-size: 36px;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.welcome-content p {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 32px;
+}
+
+.feature-list {
+  text-align: left;
+  list-style: none;
+  margin-bottom: 32px;
+}
+
+.feature-list li {
+  padding: 12px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+/* 笔记和书签列表 */
+.notes-list,
+.bookmarks-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.note-item,
+.bookmark-item {
+  padding: 10px;
+  margin-bottom: 8px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid #667eea;
+}
+
+.note-item:hover,
+.bookmark-item:hover {
+  background-color: #f0f0f0;
+  transform: translateX(4px);
+}
+
+.note-item-text {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.note-item-content {
+  font-size: 12px;
+  color: #333;
+  font-weight: 500;
+}
+
+.bookmark-item-text {
+  font-size: 13px;
+  color: #333;
+}
+
+.empty-state {
+  text-align: center;
+  color: #999;
+  font-size: 13px;
+  padding: 20px 0;
+}
+
+/* 翻译面板 */
+.translation-panel,
+.note-panel {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 400px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panel-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.panel-content {
+  padding: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.original-text,
+.translated-text,
+.note-context,
+.note-input {
+  margin-bottom: 16px;
+}
+
+.original-text h4,
+.translated-text h4,
+.note-context h4,
+.note-input h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #666;
+}
+
+.original-text p,
+.translated-text p,
+.note-context p {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.6;
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+}
+
+.note-input textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+}
+
+.note-input textarea:focus {
+  border-color: #667eea;
+}
+
+.panel-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.panel-actions .btn {
+  flex: 1;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* 文本高亮 */
+.highlight {
+  background-color: #fff59d;
+  padding: 2px 0;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.highlight:hover {
+  background-color: #fff176;
+}
+
+/* ===== PDF 渲染样式 ===== */
+
+.pdf-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 15px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.pdf-toolbar .btn {
+  min-width: 36px;
+  padding: 6px 12px;
+}
+
+.pdf-zoom-level {
+  min-width: 50px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.pdf-page-info {
+  margin-left: auto;
+  font-weight: 500;
+}
+
+.pdf-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.pdf-page-wrapper {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.pdf-page-header {
+  padding: 10px 15px;
+  background: #f5f5f7;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 13px;
+  color: #666;
+  text-align: center;
+  font-weight: 500;
+}
+
+.pdf-page-container {
+  position: relative;
+  margin: 0;
+  line-height: 0;
+}
+
+.pdf-canvas {
+  display: block;
+}
+
+/* PDF 文本层 - 用于文本选择 */
+.pdf-text-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  opacity: 0.2;
+  line-height: 1;
+  pointer-events: auto;
+}
+
+.pdf-text-layer span {
+  position: absolute;
+  white-space: pre;
+  color: transparent;
+  pointer-events: auto;
+  cursor: text;
+}
+
+.pdf-text-layer span::selection {
+  background: rgba(0, 0, 255, 0.3);
+}
+
+.pdf-text-layer span::-moz-selection {
+  background: rgba(0, 0, 255, 0.3);
+}
+
+/* 选中文本样式 */
+::selection {
+  background-color: #b3d4fc;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}

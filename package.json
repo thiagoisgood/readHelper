@@ -1,0 +1,44 @@
+{
+  "name": "read-helper",
+  "version": "1.0.0",
+  "description": "A Mac document reader with translation, notes, and annotation features",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --enable-logging",
+    "build": "electron-builder"
+  },
+  "keywords": [
+    "electron",
+    "reader",
+    "translation",
+    "notes",
+    "mac"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "iconv-lite": "^0.7.1",
+    "marked": "^11.0.0",
+    "pdfjs-dist": "^3.11.174"
+  },
+  "build": {
+    "appId": "com.readhelper.app",
+    "productName": "ReadHelper",
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.productivity"
+    },
+    "files": [
+      "**/*",
+      "!**/*.ts",
+      "!*.map"
+    ]
+  }
+}
