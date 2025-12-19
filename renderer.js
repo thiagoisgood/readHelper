@@ -158,6 +158,10 @@ function initializeApp() {
     translationPanel.classList.add("hidden");
   });
 
+  document
+    .getElementById("saveTranslationAsNote")
+    .addEventListener("click", saveTranslationAsNote);
+
   document.getElementById("closeNote").addEventListener("click", hideNotePanel);
   document
     .getElementById("cancelNote")
@@ -1559,12 +1563,17 @@ async function translateSelection() {
 
   document.getElementById("originalText").textContent = selectedText;
   document.getElementById("translatedText").textContent = "翻译中...";
+  document.getElementById("saveTranslationAsNote").disabled = true;
   translationPanel.classList.remove("hidden");
 
   try {
     // 使用简单的翻译API（这里使用免费的 LibreTranslate 或者模拟翻译）
     const translatedText = await translateText(selectedText);
     document.getElementById("translatedText").textContent = translatedText;
+    // 翻译成功后启用保存按钮
+    if (!translatedText.startsWith("翻译失败")) {
+      document.getElementById("saveTranslationAsNote").disabled = false;
+    }
   } catch (error) {
     document.getElementById("translatedText").textContent =
       "翻译失败: " + error.message;
@@ -1630,10 +1639,8 @@ async function translateText(text) {
       data.data.translations.length > 0
     ) {
       const translation = data.data.translations[0];
-      const detectedSource = translation.detectedSourceLanguage || "auto";
       const translatedText = translation.translatedText;
-      const langInfo = `[${detectedSource.toUpperCase()} → ${targetLanguage.toUpperCase()}]`;
-      return `${langInfo}\n\n${translatedText}`;
+      return translatedText;
     } else {
       throw new Error("未收到翻译结果");
     }
@@ -1712,6 +1719,9 @@ async function saveNote() {
     renderNotesList();
     hideNotePanel();
 
+    // 显示成功提示
+    showToast("笔记保存成功");
+
     // 高亮显示有笔记的文本（仅对非PDF文档生效）
     if (!currentPdf) {
       highlightText(textToSave, "note");
@@ -1719,6 +1729,62 @@ async function saveNote() {
   } catch (error) {
     console.error("保存笔记出错:", error);
     alert("保存笔记出错: " + error.message);
+  }
+}
+
+// 将翻译结果保存为笔记
+async function saveTranslationAsNote() {
+  const originalText = document.getElementById("originalText").textContent;
+  const translatedText = document.getElementById("translatedText").textContent;
+
+  if (!originalText || translatedText === "翻译中...") {
+    alert("请等待翻译完成");
+    return;
+  }
+
+  if (!currentFilePath) {
+    alert("请先打开一个文档");
+    return;
+  }
+
+  try {
+    const note = {
+      id: Date.now(),
+      text: originalText,
+      content: translatedText,
+      timestamp: new Date().toISOString(),
+    };
+
+    currentNotes.push(note);
+
+    // 保存到本地
+    const result = await ipcRenderer.invoke("save-notes", {
+      filePath: currentFilePath,
+      notes: currentNotes,
+    });
+
+    if (result.error) {
+      console.error("保存笔记失败:", result.error);
+      alert("保存失败: " + result.error);
+      currentNotes.pop();
+      return;
+    }
+
+    renderNotesList();
+
+    // 关闭翻译面板
+    translationPanel.classList.add("hidden");
+
+    // 显示成功提示
+    showToast("翻译已保存为笔记");
+
+    // 高亮显示有笔记的文本（仅对非PDF文档生效）
+    if (!currentPdf) {
+      highlightText(originalText, "note");
+    }
+  } catch (error) {
+    console.error("保存翻译笔记出错:", error);
+    alert("保存失败: " + error.message);
   }
 }
 
@@ -1888,6 +1954,9 @@ async function addBookmark() {
     }
 
     renderBookmarksList();
+
+    // 显示成功提示
+    showToast("书签保存成功");
   } catch (error) {
     console.error("保存书签出错:", error);
     alert("保存书签出错: " + error.message);
@@ -2225,4 +2294,25 @@ async function updateBooksCount() {
   // 直接使用已加载的历史记录数组
   const count = documentHistory ? documentHistory.length : 0;
   document.getElementById("totalBooksRead").textContent = count;
+}
+
+// ===== Toast 提示功能 =====
+
+function showToast(message, duration = 2000) {
+  // 创建或获取 toast 容器
+  let toast = document.getElementById("toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "toast";
+    toast.className = "toast";
+    document.body.appendChild(toast);
+  }
+
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  // 自动隐藏
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, duration);
 }

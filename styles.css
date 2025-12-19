@@ -1118,6 +1118,37 @@ body {
   font-weight: 600;
 }
 
+.panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-icon-header {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-icon-header:hover:not(:disabled) {
+  background: rgba(102, 126, 234, 0.2);
+  transform: scale(1.05);
+}
+
+.btn-icon-header:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .panel-content {
   padding: 20px;
   max-height: 400px;
@@ -1175,6 +1206,17 @@ body {
 
 .panel-actions .btn {
   flex: 1;
+}
+
+.panel-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.panel-footer .btn {
+  min-width: 120px;
 }
 
 .hidden {
@@ -1288,16 +1330,19 @@ body {
   color: transparent;
   position: absolute;
   white-space: pre;
-  cursor: text;
+  cursor: default;
   transform-origin: 0% 0%;
+  pointer-events: none; /* 禁用鼠标直接选中，只能使用框选 */
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .textLayer span::selection {
-  background: rgba(0, 0, 255, 0.3);
+  background: transparent;
 }
 
 .textLayer span::-moz-selection {
-  background: rgba(0, 0, 255, 0.3);
+  background: transparent;
 }
 
 /* 选中文本样式 */
@@ -2021,4 +2066,28 @@ body {
 
 .settings-footer .btn {
   flex: 1;
+}
+
+/* ===== Toast 提示样式 ===== */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
 }
