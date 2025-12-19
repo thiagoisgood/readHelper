@@ -76,12 +76,6 @@ const sidebarToggle = document.getElementById("sidebarToggle");
 const actionToolbar = document.getElementById("actionToolbar");
 const zoomControls = document.getElementById("zoomControls");
 
-// 图标栏按钮
-const iconOpenFile = document.getElementById("iconOpenFile");
-const iconHistory = document.getElementById("iconHistory");
-const iconNotes = document.getElementById("iconNotes");
-const iconBookmarks = document.getElementById("iconBookmarks");
-
 // 框选提取相关元素
 const extractBtn = document.getElementById("extractBtn");
 const extractionPanel = document.getElementById("extractionPanel");
@@ -111,36 +105,37 @@ function initializeApp() {
   // 侧边栏展开/收起事件（单一按钮控制）
   sidebarToggle.addEventListener("click", toggleSidebar);
 
+  // 设置按钮事件
+  document
+    .getElementById("settingsBtn")
+    .addEventListener("click", showSettings);
+  document
+    .getElementById("closeSettingsBtn")
+    .addEventListener("click", hideSettings);
+  document
+    .getElementById("cancelSettingsBtn")
+    .addEventListener("click", hideSettings);
+  document
+    .getElementById("saveSettingsBtn")
+    .addEventListener("click", saveSettings);
+  document
+    .getElementById("settingsOverlay")
+    .addEventListener("click", hideSettings);
+
+  // API Key 显示/隐藏切换
+  document.getElementById("toggleDeepseekKey").addEventListener("click", () => {
+    togglePasswordVisibility("deepseekApiKey");
+  });
+  document.getElementById("toggleGoogleKey").addEventListener("click", () => {
+    togglePasswordVisibility("googleApiKey");
+  });
+
   // 可折叠区域事件（笔记栏和书签栏）
   document.getElementById("notesHeader").addEventListener("click", () => {
     toggleCollapsibleSection("notesHeader");
   });
   document.getElementById("bookmarksHeader").addEventListener("click", () => {
     toggleCollapsibleSection("bookmarksHeader");
-  });
-
-  // 图标栏按钮事件
-  iconOpenFile.addEventListener("click", openFile);
-  iconHistory.addEventListener("click", () => {
-    expandSidebar();
-    // 滚动到历史记录区域
-    setTimeout(() => {
-      document
-        .querySelector(".history-section")
-        ?.scrollIntoView({ behavior: "smooth" });
-    }, 300);
-  });
-  iconNotes.addEventListener("click", () => {
-    expandSidebar();
-    setTimeout(() => {
-      notesList.scrollIntoView({ behavior: "smooth" });
-    }, 300);
-  });
-  iconBookmarks.addEventListener("click", () => {
-    expandSidebar();
-    setTimeout(() => {
-      bookmarksList.scrollIntoView({ behavior: "smooth" });
-    }, 300);
   });
 
   // 固定工具栏的缩放按钮
@@ -189,6 +184,9 @@ function initializeApp() {
 
   // 初始化 TTS
   initializeTTS();
+
+  // 初始化顶部状态栏
+  initializeStatusBar();
 
   // 监听文本选择
   document.addEventListener("selectionchange", handleTextSelection);
@@ -258,6 +256,7 @@ async function loadHistory() {
     const result = await ipcRenderer.invoke("get-history");
     documentHistory = result.history || [];
     renderHistoryList();
+    updateBooksCount(); // 更新顶部状态栏书籍数量
   } catch (error) {
     console.error("Failed to load history:", error);
   }
@@ -278,6 +277,7 @@ async function addToHistory(filePath, fileName, fileType) {
     if (result.success) {
       documentHistory = result.history;
       renderHistoryList();
+      updateBooksCount(); // 更新顶部状态栏书籍数量
     }
   } catch (error) {
     console.error("Failed to add history:", error);
@@ -1310,7 +1310,7 @@ function loadVoices() {
       `${i}: ${v.name} (${v.lang}) ${v.localService ? "[local]" : "[remote]"}`
     );
   });
-  
+
   // 如果语音列表为空，稍后重试
   if (availableVoices.length === 0) {
     setTimeout(loadVoices, 100);
@@ -1360,7 +1360,9 @@ function selectVoiceForLanguage(lang) {
       availableVoices.find((v) => v.lang === "zh-TW") ||
       availableVoices.find((v) => v.lang === "zh-HK") ||
       availableVoices.find((v) => v.lang.startsWith("zh")) ||
-      availableVoices.find((v) => v.lang.includes("CN") || v.lang.includes("Chinese"));
+      availableVoices.find(
+        (v) => v.lang.includes("CN") || v.lang.includes("Chinese")
+      );
   } else {
     // macOS 高质量英文语音优先
     preferredVoice =
@@ -1373,14 +1375,20 @@ function selectVoiceForLanguage(lang) {
       availableVoices.find((v) => v.lang.startsWith("en"));
   }
 
-  console.log("Selected voice for lang", lang, ":", preferredVoice?.name, preferredVoice?.lang);
-  
+  console.log(
+    "Selected voice for lang",
+    lang,
+    ":",
+    preferredVoice?.name,
+    preferredVoice?.lang
+  );
+
   // 如果没找到匹配语音，使用默认语音但设置正确的语言
   if (!preferredVoice && availableVoices.length > 0) {
     console.warn("No matching voice found for language:", lang);
     preferredVoice = availableVoices[0];
   }
-  
+
   return preferredVoice;
 }
 
@@ -1414,14 +1422,24 @@ function speakText(text) {
   } else {
     // 如果没有找到语音，设置默认语言
     currentUtterance.lang = lang === "zh" ? "zh-CN" : "en-US";
-    console.warn("No voice available, using default lang:", currentUtterance.lang);
+    console.warn(
+      "No voice available, using default lang:",
+      currentUtterance.lang
+    );
   }
-  
+
   currentUtterance.rate = currentTTSRate;
   currentUtterance.pitch = 1.0;
   currentUtterance.volume = 1.0;
-  
-  console.log("TTS config - Voice:", voice?.name, "Lang:", currentUtterance.lang, "Rate:", currentTTSRate);
+
+  console.log(
+    "TTS config - Voice:",
+    voice?.name,
+    "Lang:",
+    currentUtterance.lang,
+    "Rate:",
+    currentTTSRate
+  );
 
   // 事件监听
   currentUtterance.onstart = () => {
@@ -2110,4 +2128,101 @@ function showError(message) {
       <p style="color: #666; margin-top: 16px;">${message}</p>
     </div>
   `;
+}
+
+// ===== 设置功能 =====
+
+function showSettings() {
+  // 加载当前配置到表单
+  document.getElementById("deepseekApiKey").value =
+    config?.deepseek?.apiKey || "";
+  document.getElementById("deepseekEnabled").checked =
+    config?.deepseek?.enabled !== false;
+  document.getElementById("googleApiKey").value =
+    config?.googleCloud?.apiKey || "";
+  document.getElementById("defaultTargetLang").value =
+    config?.translation?.defaultTargetLanguage || "zh-CN";
+
+  // 显示模态框
+  document.getElementById("settingsOverlay").classList.remove("hidden");
+  document.getElementById("settingsModal").classList.remove("hidden");
+}
+
+function hideSettings() {
+  document.getElementById("settingsOverlay").classList.add("hidden");
+  document.getElementById("settingsModal").classList.add("hidden");
+}
+
+async function saveSettings() {
+  const newConfig = {
+    googleCloud: {
+      apiKey: document.getElementById("googleApiKey").value.trim(),
+    },
+    deepseek: {
+      apiKey: document.getElementById("deepseekApiKey").value.trim(),
+      enabled: document.getElementById("deepseekEnabled").checked,
+    },
+    translation: {
+      defaultTargetLanguage: document.getElementById("defaultTargetLang").value,
+      alternativeTargetLanguage:
+        config?.translation?.alternativeTargetLanguage || "en",
+    },
+  };
+
+  try {
+    const result = await ipcRenderer.invoke("save-config", newConfig);
+    if (result.success) {
+      // 更新内存中的配置
+      config = newConfig;
+      hideSettings();
+      alert("设置已保存！");
+    } else {
+      alert("保存失败：" + result.error);
+    }
+  } catch (error) {
+    console.error("Failed to save settings:", error);
+    alert("保存设置失败：" + error.message);
+  }
+}
+
+function togglePasswordVisibility(inputId) {
+  const input = document.getElementById(inputId);
+  if (input.type === "password") {
+    input.type = "text";
+  } else {
+    input.type = "password";
+  }
+}
+
+// ===== 顶部状态栏功能 =====
+
+function initializeStatusBar() {
+  // 更新时间
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+
+  // 更新阅读书籍数量
+  updateBooksCount();
+}
+
+function updateDateTime() {
+  const now = new Date();
+  const options = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  };
+  const formatted = now.toLocaleString("zh-CN", options);
+  document.getElementById("currentDateTime").textContent = formatted;
+}
+
+async function updateBooksCount() {
+  // 直接使用已加载的历史记录数组
+  const count = documentHistory ? documentHistory.length : 0;
+  document.getElementById("totalBooksRead").textContent = count;
 }

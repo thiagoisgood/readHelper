@@ -453,6 +453,33 @@ ipcMain.handle("check-file-exists", async (event, filePath) => {
   return fs.existsSync(filePath);
 });
 
+// 保存配置
+ipcMain.handle("save-config", async (event, configData) => {
+  try {
+    const configPath = path.join(__dirname, "config.json");
+    fs.writeFileSync(configPath, JSON.stringify(configData, null, 2));
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to save config:", error);
+    return { success: false, error: error.message };
+  }
+});
+
+// 加载配置
+ipcMain.handle("load-config", async () => {
+  try {
+    const configPath = path.join(__dirname, "config.json");
+    if (fs.existsSync(configPath)) {
+      const data = fs.readFileSync(configPath, "utf-8");
+      return { success: true, config: JSON.parse(data) };
+    }
+    return { success: true, config: {} };
+  } catch (error) {
+    console.error("Failed to load config:", error);
+    return { success: false, error: error.message };
+  }
+});
+
 app.whenReady().then(() => {
   createWindow();
 
